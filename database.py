@@ -29,5 +29,35 @@ def addStaff(surname,forename,role,email,password):
     con.commit()
     closeDb()
 
+def removeStaff(pkey):
+    con,cur = openDb()
+    cur.execute("DELETE FROM staffAccounts WHERE staffID = ?",
+                (pkey,))
+    con.commit()
+    closeDb()
+
+def updateStaff(pkey, **kwargs):
+    con,cur = openDb()
+    for kwarg in kwargs:
+        cur.execute(f"UPDATE staffAccounts SET {kwarg} = ? WHERE staffID = ?",
+                    (kwargs[kwarg], pkey))
+        con.commit()
+    closeDb()
+
+def getAllStaff():
+    con,cur = openDb()
+    cur.execute("SELECT * FROM staffAccounts")
+    allStaff = cur.fetchall()
+    closeDb()
+    return allStaff
+
 if __name__ == "__main__":
-    pass
+    print(getAllStaff())
+    addStaff("Hackett-Mingsong","Siwakorn","Waiter/Bar Staff","testemail1@gmail.com","Password1")
+    addStaff("Hackett-Mingsong","Natawood","Kitchen Porter","testemail2@gmail.com","Password2")
+    print(getAllStaff())
+    updateStaff(2,jobRole = "Kitchen Assistant")
+    print(getAllStaff())
+    removeStaff(1)
+    removeStaff(2)
+    print(getAllStaff())
