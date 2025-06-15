@@ -51,13 +51,53 @@ def getAllStaff():
     closeDb()
     return allStaff
 
+#Creating the table for customer accounts
+con,cur = openDb()
+cur.execute("""CREATE TABLE IF NOT EXISTS customerAccounts(
+            customerID INTEGER PRIMARY KEY,
+            surname TEXT NOT NULL,
+            forename TEXT NOT NULL,
+            emailAddress STRING NOT NULL,
+            password STRING NOT NULL)""")
+closeDb()
+
+#Creating all the functions for customer accounts
+def addCustomer(surname,forename,email,password):
+    con,cur = openDb()
+    cur.execute("""INSERT INTO customerAccounts(surname,forename,emailAddress,password)
+                VALUES ?,?,?,?""", (surname,forename,email,password))
+    con.commit()
+    closeDb()
+
+def removeCustomer(pkey):
+    con,cur = openDb()
+    cur.execute("DELETE FROM customerAccounts WHERE customerID = ?",
+                (pkey,))
+    con.commit()
+    closeDb()
+
+def updateCustomer(pkey, **kwargs):
+    con,cur = openDb()
+    for kwarg in kwargs:
+        cur.execute(f"UPDATE customerAccounts SET {kwarg} = ? WHERE customerID =?",
+                    (kwargs[kwarg],pkey))
+        con.commit()
+    closeDb()
+
+def getAllCustomers():
+    con,cur = openDb()
+    cur.execute("SELECT * FROM customerAccounts")
+    allCustomers = cur.fetchall()
+    closeDb()
+    return allCustomers
+
 if __name__ == "__main__":
-    print(getAllStaff())
-    addStaff("Hackett-Mingsong","Siwakorn","Waiter/Bar Staff","testemail1@gmail.com","Password1")
-    addStaff("Hackett-Mingsong","Natawood","Kitchen Porter","testemail2@gmail.com","Password2")
-    print(getAllStaff())
-    updateStaff(2,jobRole = "Kitchen Assistant")
-    print(getAllStaff())
-    removeStaff(1)
-    removeStaff(2)
-    print(getAllStaff())
+    print(getAllCustomers())
+    addCustomer("testSurname","testName","test@gmail.com","Password123")
+    addCustomer("testSurname2","TestFirstname","anotherTest@gmail.com","PasswordTesting1")
+    print(getAllCustomers())
+    updateCustomer(2,password = "NewPassword")
+    print(getAllCustomers())
+    removeCustomer(1)
+    removeCustomer(2)
+    print(getAllCustomers())
