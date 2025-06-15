@@ -51,6 +51,14 @@ def getAllStaff():
     closeDb()
     return allStaff
 
+def getStaff(pkey):
+    con,cur = openDb()
+    cur.execute("SELECT * FROM staffAccounts WHERE staffID = ?",
+                (pkey,))
+    staff = cur.fetchall()
+    closeDb()
+    return staff
+
 #Creating the table for customer accounts
 con,cur = openDb()
 cur.execute("""CREATE TABLE IF NOT EXISTS customerAccounts(
@@ -91,13 +99,26 @@ def getAllCustomers():
     closeDb()
     return allCustomers
 
+def getCustomer(pkey):
+    con,cur = openDb()
+    cur.execute("SELECT * FROM customerAccounts WHERE customerID = ?",
+                (pkey,))
+    customer = cur.fetchall()
+    closeDb()
+    return customer
+
 if __name__ == "__main__":
     print(getAllCustomers())
-    addCustomer("testSurname","testName","test@gmail.com","Password123")
-    addCustomer("testSurname2","TestFirstname","anotherTest@gmail.com","PasswordTesting1")
-    print(getAllCustomers())
-    updateCustomer(2,password = "NewPassword")
-    print(getAllCustomers())
+    print(getAllStaff())
+    addStaff("test1","testFirstname1","TestRole1","Test1@testmail.com","Password1")
+    addStaff("test2","testFirstname2","TestRole2","Test2@testmail.com","Password2")
+    addCustomer("test3","testFirstname3","Test3@testmail.com","Password3")
+    addCustomer("test4","testFirstname4","Test4@testmail.com","Password4")
+    print(getCustomer(2))
+    print(getStaff(1))
     removeCustomer(1)
     removeCustomer(2)
+    removeStaff(1)
+    removeStaff(2)
     print(getAllCustomers())
+    print(getAllStaff())
