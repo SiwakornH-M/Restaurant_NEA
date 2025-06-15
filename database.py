@@ -65,7 +65,7 @@ closeDb()
 def addCustomer(surname,forename,email,password):
     con,cur = openDb()
     cur.execute("""INSERT INTO customerAccounts(surname,forename,emailAddress,password)
-                VALUES ?,?,?,?""", (surname,forename,email,password))
+                VALUES (?,?,?,?)""", (surname,forename,email,password))
     con.commit()
     closeDb()
 
