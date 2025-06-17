@@ -108,7 +108,7 @@ def getCustomer(pkey):
     return customer
 
 con,cur = openDb()
-cur.execute("""CREATE TABLE IF NOT EXISTS menu(" 
+cur.execute("""CREATE TABLE IF NOT EXISTS menu( 
             dishID INTEGER PRIMARY KEY,
             name TEXT NOT NULL,
             ingredients TEXT NOT NULL,
