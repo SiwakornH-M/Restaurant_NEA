@@ -107,6 +107,52 @@ def getCustomer(pkey):
     closeDb()
     return customer
 
+con,cur = openDb()
+cur.execute("""CREATE TABLE IF NOT EXISTS menu(" 
+            dishID INTEGER PRIMARY KEY,
+            name TEXT NOT NULL,
+            ingredients TEXT NOT NULL,
+            allergens TEXT NOT NULL,
+            price FLOAT NOT NULL)""")
+closeDb()
+
+def addDish(name,ingredients,allergens,price):
+    con,cur = openDb()
+    cur.execute("""INSERT INTO menu(name, ingredients,allergens,price)
+                VALUES (?,?,?,?)""", (name,ingredients,allergens,price))
+    con.commit()
+    closeDb()
+
+def removeDish(pkey):
+    con,cur = openDb()
+    cur.execute("DELETE FROM menu WHERE dishID = ?",
+                (pkey,))
+    con.commit()
+    closeDb()
+
+def updateDish(pkey, **kwargs):
+    con,cur = openDb()
+    for kwarg in kwargs:
+        cur.execute(f"UPDATE menu SET {kwarg} = ? WHERE dishID = ?",
+                    (kwargs[kwarg],pkey))
+        con.commit()
+        closeDb()
+
+def getMenu():
+    con,cur = openDb()
+    cur.execute("SELECT * FROM menu")
+    menu = cur.fetchall()
+    closeDb()
+    return menu
+
+def getDish(pkey):
+    con,cur = openDb()
+    cur.execute("SELECT * FROM menu WHERE dishID = ?",
+                (pkey,))
+    dish = cur.fetchall()
+    closeDb()
+    return dish
+
 if __name__ == "__main__":
     print(getAllCustomers())
     print(getAllStaff())
