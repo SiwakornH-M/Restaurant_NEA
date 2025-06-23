@@ -107,8 +107,9 @@ def getCustomer(pkey):
     closeDb()
     return customer
 
+#Creating the menu table and all associated functions
 con,cur = openDb()
-cur.execute("""CREATE TABLE IF NOT EXISTS menu(" 
+cur.execute("""CREATE TABLE IF NOT EXISTS menu( 
             dishID INTEGER PRIMARY KEY,
             name TEXT NOT NULL,
             ingredients TEXT NOT NULL,
@@ -116,6 +117,7 @@ cur.execute("""CREATE TABLE IF NOT EXISTS menu("
             price FLOAT NOT NULL)""")
 closeDb()
 
+#Creating the functions for the menu table 
 def addDish(name,ingredients,allergens,price):
     con,cur = openDb()
     cur.execute("""INSERT INTO menu(name, ingredients,allergens,price)
@@ -153,18 +155,80 @@ def getDish(pkey):
     closeDb()
     return dish
 
+#Creating the table for orders
+con,cur = openDb()
+cur.execute("""CREATE TABLE IF NOT EXISTS orders(
+            orderID INTEGER PRIMARY KEY,
+            account TEXT,
+            details TEXT NOT NULL, 
+            cost FLOAT NOT NULL)""") #details is what dishes are in the order
+closeDb()
+
+def addOrder(account,dishes):
+    con,cur = openDb()
+    dishes = dishes.split("|")
+    totalCost = 0
+    details = ""
+    #Finds the total cost of everything in the order
+    for dish in dishes:
+        #Retrieves price of each item from database
+        cur.execute("SELECT price FROM menu WHERE name = ?",
+                    (dish,))
+        price = cur.fetchone()
+        totalCost += price #adds the price to the total
+        #Retrieves the primary key of each item
+        cur.execute(f"SELECT dishID FROM menu WHERE name = ?",
+                    (dish,))
+        ID = cur.fetchone
+        details += ID +"|" #Adds primary key to a string
+    cur.execute("INSERT INTO orders(account,details,cost) VALUES (?,?,?)",
+                (account,details,totalCost))
+    con.commit()
+    closeDb()
+    
+def removeOrder(pkey):
+    con,cur = openDb()
+    cur.execute("DELETE FROM orders WHERE orderID = ?",
+                (pkey,))
+    con.commit()
+    closeDb()
+
+def updateOrder(pkey,**kwargs):
+    con,cur = openDb()
+    for kwarg in kwargs:
+        cur.execute(f"UPDATE orders SET {kwarg} = ? WHERE orderID = ?",
+                    (kwargs[kwarg],pkey))
+        con.commit()
+    closeDb()
+
+def allOrders():
+    con,cur = openDb()
+    cur.execute("SELECT * FROM orders")
+    orders = cur.fetchall()
+    closeDb()
+    return orders
+
+def getOrder(pkey):
+    con,cur = openDb()
+    cur.execute("SELECT FROM orders WHERE orderID = ?",
+                (pkey,))
+    order = cur.fetchall()
+    closeDb()
+    return order()
+
 if __name__ == "__main__":
-    print(getAllCustomers())
-    print(getAllStaff())
-    addStaff("test1","testFirstname1","TestRole1","Test1@testmail.com","Password1")
-    addStaff("test2","testFirstname2","TestRole2","Test2@testmail.com","Password2")
-    addCustomer("test3","testFirstname3","Test3@testmail.com","Password3")
-    addCustomer("test4","testFirstname4","Test4@testmail.com","Password4")
-    print(getCustomer(2))
-    print(getStaff(1))
-    removeCustomer(1)
-    removeCustomer(2)
-    removeStaff(1)
-    removeStaff(2)
-    print(getAllCustomers())
-    print(getAllStaff())
+    print(allOrders())
+    print(getMenu())
+    addDish("egg rolls","eggs","eggs",4.99)
+    addDish("pork belly","pork","none",9.99)
+    print(getMenu())
+    addOrder(None,"egg rolls")
+    addOrder(None,"egg rolls|pork belly")
+    print(allOrders())
+    print(getOrder(1))
+    removeOrder(1)
+    removeOrder(2)
+    removeDish(1)
+    removeDish(2)
+    print(getMenu())
+    print(allOrders())
