@@ -175,12 +175,14 @@ def addOrder(account,dishes):
         cur.execute("SELECT price FROM menu WHERE name = ?",
                     (dish,))
         price = cur.fetchone()
-        totalCost += price #adds the price to the total
+        for num in price:
+            cost = float(num)
+        totalCost += cost #adds the price to the total
         #Retrieves the primary key of each item
         cur.execute(f"SELECT dishID FROM menu WHERE name = ?",
                     (dish,))
         ID = cur.fetchone
-        details += ID +"|" #Adds primary key to a string
+        details += str(ID) +"|" #Adds primary key to a string
     cur.execute("INSERT INTO orders(account,details,cost) VALUES (?,?,?)",
                 (account,details,totalCost))
     con.commit()
@@ -210,11 +212,11 @@ def allOrders():
 
 def getOrder(pkey):
     con,cur = openDb()
-    cur.execute("SELECT FROM orders WHERE orderID = ?",
+    cur.execute("SELECT * FROM orders WHERE orderID = ?",
                 (pkey,))
     order = cur.fetchall()
     closeDb()
-    return order()
+    return order
 
 if __name__ == "__main__":
     print(allOrders())
