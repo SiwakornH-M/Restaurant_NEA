@@ -193,7 +193,7 @@ def addOrder(account,dishes):
     details = ""
     #Adds every dishes primary key to details
     for char in tempList:
-        details += char
+        details += str(char)
     cur.execute("INSERT INTO orders(account,details,cost) VALUES (?,?,?)",
                 (account,details,totalCost))
     con.commit()
