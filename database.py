@@ -168,7 +168,7 @@ def addOrder(account,dishes):
     con,cur = openDb()
     dishes = dishes.split("|")
     totalCost = 0
-    details = ""
+    tempList = []
     #Finds the total cost of everything in the order
     for dish in dishes:
         #Retrieves price of each item from database
@@ -179,10 +179,21 @@ def addOrder(account,dishes):
             cost = float(num)
         totalCost += cost #adds the price to the total
         #Retrieves the primary key of each item
-        cur.execute(f"SELECT dishID FROM menu WHERE name = ?",
+        cur.execute("SELECT dishID FROM menu WHERE name = ?",
                     (dish,))
-        ID = cur.fetchone
-        details += str(ID) +"|" #Adds primary key to a string
+        id = cur.fetchmany()
+        #Adds the primary key of each dish to a list
+        for tuple in id:
+            for pkey in tuple:
+                tempList.append(pkey)
+                tempList.append("|")
+    #Checks to see if the last item in the list is "|"
+    if tempList[-1] == "|":
+        tempList.pop()
+    details = ""
+    #Adds every dishes primary key to details
+    for char in tempList:
+        details += char
     cur.execute("INSERT INTO orders(account,details,cost) VALUES (?,?,?)",
                 (account,details,totalCost))
     con.commit()
